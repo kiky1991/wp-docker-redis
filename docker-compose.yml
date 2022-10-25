@@ -46,6 +46,10 @@ services:
       WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
       WORDPRESS_DB_NAME: ${DB_NAME}
       WORDPRESS_TABLE_PREFIX: wpdr_
+      WORDPRESS_CONFIG_EXTRA: |
+        /* wpconfig */
+        define( 'FS_METHOD', 'direct' );
+        define( 'WP_REDIS_HOST', 'redis' );
     volumes:
       - ./config/php.conf.ini:/usr/local/etc/php/conf.d/php.ini
       - ./wordpress:/var/www/html
@@ -59,6 +63,7 @@ services:
     networks:
       - wp-docker-redis
 
+  # phpredis custom image
   phpredis:
     depends_on:
       - redis
@@ -66,6 +71,26 @@ services:
     build: ./config/redis/
     image: ${IMAGE_PHPREDIS}
     container_name: ${CONTAINER_PHPREDIS_NAME}
+    networks:
+      - wp-docker-redis
+
+# wordpress CLI
+  cli:
+    image: wordpress:cli
+    container_name: ${CONTAINER_CLI_NAME}
+    user: xfs
+    volumes:
+      - ./wordpress:/var/www/html:rw
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: ${DB_NAME}
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WORDPRESS_TABLE_PREFIX: wpdr_
+    depends_on:
+      - db
+      - wordpress
+    command: "tail -f /dev/null"
     networks:
       - wp-docker-redis
 

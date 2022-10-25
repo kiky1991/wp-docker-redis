@@ -8,6 +8,7 @@ The installation tool kit, provided here, include:
   - phpMyAdmin interface to connect to your MySQL database
   - Redis for cache high performance.
   - PhpRedis for cache extension.
+  - wp-cli for cli command
 
 **How it work ?**:
 
@@ -17,19 +18,17 @@ The installation tool kit, provided here, include:
 # clone repo
 git clone https://github.com/kiky1991/wp-docker-redis
 cd wp-docker-redis
+
 # Build and start installation
 docker-compose up -d --build
+
+# using wp cli
+docker-compose run --rm cli wp --version
 ```
+
+After clone repo Change configuration on .env if you like it.
 
 ***SECOND***
-
-Open wp-config.php and add below variable:
-
-```
-define( 'WP_REDIS_HOST', 'redis' );
-```
-
-***THIRD***
 
 Install Plugin `Redis Object Cache` then click active plugin
 
