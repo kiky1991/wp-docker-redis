@@ -13,7 +13,7 @@ The installation tool kit, provided here, include:
 
 ``` bash
 # clone repo
-git clone https://github.com/kassambara/wordpress-docker-compose
+git clone https://github.com/kiky1991/wp-docker-redis
 cd wp-docker-redis
 # Build and start installation
 docker-compose up -d --build
