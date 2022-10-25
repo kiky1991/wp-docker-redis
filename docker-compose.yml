@@ -1,0 +1,76 @@
+version: '3.7'
+
+services:
+  # database connection
+  db:
+    image: mariadb:${IMAGE_DB_VERSION:-jammy}
+    container_name: ${CONTAINER_DB_NAME}
+    restart: always
+    environment:
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - ./db:/var/lib/mysql
+    networks:
+      - wp-docker-redis
+
+  # phpmyadmin
+  phpmyadmin:
+    depends_on:
+      - db
+    image: phpmyadmin/phpmyadmin:${IMAGE_PHPMYADMIN_VERSION:-latest}
+    container_name: ${CONTAINER_PHPMYADMIN_NAME}
+    restart: always
+    ports:
+      - ${PORT_PHPMYADMIN:-9999}:80
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD} 
+    networks:
+      - wp-docker-redis
+
+  # wordpress data
+  wordpress:
+    depends_on: 
+      - db
+    image: wordpress:${IMAGE_WP_VERSION:-latest}
+    container_name: ${CONTAINER_WP_NAME}
+    restart: always
+    ports:
+      - ${PORT_WP:-8080}:80
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WORDPRESS_DB_NAME: ${DB_NAME}
+      WORDPRESS_TABLE_PREFIX: wpdr_
+    volumes:
+      - ./config/php.conf.ini:/usr/local/etc/php/conf.d/php.ini
+      - ./wordpress:/var/www/html
+    networks:
+      - wp-docker-redis
+  
+  # redis
+  redis:
+    image: redis:${IMAGE_REDIS_VERSION:-6.2}
+    container_name: ${CONTAINER_REDIS_NAME}
+    networks:
+      - wp-docker-redis
+
+  phpredis:
+    depends_on:
+      - redis
+      - wordpress
+    build: ./config/redis/
+    image: ${IMAGE_PHPREDIS}
+    container_name: ${CONTAINER_PHPREDIS_NAME}
+    networks:
+      - wp-docker-redis
+
+networks:
+  wp-docker-redis:
+volumes:
+  wordpress:
+  db:
