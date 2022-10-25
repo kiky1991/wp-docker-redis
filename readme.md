@@ -11,6 +11,8 @@ The installation tool kit, provided here, include:
 
 **How it work ?**:
 
+***FIRST***
+
 ``` bash
 # clone repo
 git clone https://github.com/kiky1991/wp-docker-redis
@@ -18,6 +20,21 @@ cd wp-docker-redis
 # Build and start installation
 docker-compose up -d --build
 ```
+
+***SECOND***
+
+Open wp-config.php and add below variable:
+
+```
+define( 'WP_REDIS_HOST', 'redis' );
+```
+
+***THIRD***
+
+Install Plugin `Redis Object Cache` then click active plugin
+
+============================================================
+
 
 Visit your site at <http://localhost:8080> and your database via phpMyAdmin
 at <http://localhost:9999> (default port, change it from .env).
